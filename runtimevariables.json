@@ -1,0 +1,29 @@
+{
+	"ConnectionStrings": {
+        "StorageAccount": "DefaultEndpointsProtocol=https;AccountName=popsocialstorage;AccountKey=2CoMZqc1PX4bwQAkZcAXFZZHhDsmTVM0t+FW/T7VNvyRXnKZbVAuyKQQtkk+jKBVIUl8icDRkfiB+AStF0teRQ==;EndpointSuffix=core.windows.net"
+    },
+	"Urls": {
+		"AzureBlobBaseUrl": "photos.purpleorangepink.com",
+		"BaseDomain": "purpleorangepink.com"
+	},
+	"EmailStrings": {
+		"SupportEmail": "support@purpleorangepink.com",
+		"SupportPassword": "aghbsornsbjucmyj",
+		"NoReplyEmail": "support@purpleorangepink.com",
+		"NoReplayPassword": "aghbsornsbjucmyj",
+	},
+	"InternalParameters": {
+		"REPORT_LIMIT": 4,
+		"OLD_INVITATION_LIMIT": 4,
+		"OLD_MESSAGES_LIMIT": 14,
+		"OLD_ANNOUNCEMENT_LIMIT": 7,
+		"OLD_CONVERSATION_LIMIT": 30,
+		"MAP_LOAD_LIMIT": 100
+	},
+	"SQLStrings": {
+		"server": "tcp:popsocialserver.database.windows.net,1433",
+		"database": "popsocialdatabase",
+		"admin_login": "popdatabaseadmincontroller",
+		"admin_password": "t3e3nvuWjDss4Em",
+	}
+}

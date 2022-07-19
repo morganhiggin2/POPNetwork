@@ -1,0 +1,5 @@
+export password: hallTo4$
+
+how to make cert file with root
+openssl pkcs12 -export -out certificate.pfx -inkey certificate.pem -in certificate.pem -certfile rootcertfile.pem
+certificate.pem contains private key and certificate, rootcertfile contains just certification. can run without root file, just exclude the last two parts of the command
