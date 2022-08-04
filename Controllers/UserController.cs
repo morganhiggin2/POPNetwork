@@ -974,17 +974,17 @@ public class UserController : ControllerBase
         //get profile image uris
         JArray profileImageUrisArray = new JArray();
 
-        if (friendUser.profile_image_0_active)
+        if (friendOtherUser.profile_image_0_active)
         {
-            profileImageUrisArray.Add(AzureBlobModule.getFriendUserProfileImageUrl(user.Id, 0));
+            profileImageUrisArray.Add(AzureBlobModule.getFriendUserProfileImageUrl(otherUser.Id, 0));
         }
-        if (friendUser.profile_image_1_active)
+        if (friendOtherUser.profile_image_1_active)
         {
-            profileImageUrisArray.Add(AzureBlobModule.getFriendUserProfileImageUrl(user.Id, 1));
+            profileImageUrisArray.Add(AzureBlobModule.getFriendUserProfileImageUrl(otherUser.Id, 1));
         }
-        if (friendUser.profile_image_2_active)
+        if (friendOtherUser.profile_image_2_active)
         {
-            profileImageUrisArray.Add(AzureBlobModule.getFriendUserProfileImageUrl(user.Id, 2));
+            profileImageUrisArray.Add(AzureBlobModule.getFriendUserProfileImageUrl(otherUser.Id, 2));
         }
 
         userInformation.Add(new JProperty("profile_image_uris", profileImageUrisArray));
@@ -2438,6 +2438,25 @@ public class UserController : ControllerBase
             //add type
             participantContainer.Add(new JProperty("type", "person"));
 
+            //get profile image uri
+            string imageUri = "";
+
+            if (participantFriend.profile_image_0_active)
+            {
+                imageUri = AzureBlobModule.getFriendUserProfileImageUrl(participantUser.Id, 0);
+            }
+            else if (participantFriend.profile_image_1_active)
+            {
+                imageUri = AzureBlobModule.getFriendUserProfileImageUrl(participantUser.Id, 1);
+            }
+            else if (participantFriend.profile_image_2_active)
+            {
+                imageUri = AzureBlobModule.getFriendUserProfileImageUrl(participantUser.Id, 2);
+            }
+
+            //add image
+            participantContainer.Add(new JProperty("image_uri", imageUri));
+
             //add profile image link (however it is got in the profile image manager, either we store the link or we get it because its the same)
 
             //add participant information to container
@@ -2509,6 +2528,25 @@ public class UserController : ControllerBase
 
             //add type
             participantContainer.Add(new JProperty("type", "person"));
+
+            //get profile image uri
+            string imageUri = "";
+
+            if (participantFriend.profile_image_0_active)
+            {
+                imageUri = AzureBlobModule.getFriendUserProfileImageUrl(participantUser.Id, 0);
+            }
+            else if (participantFriend.profile_image_1_active)
+            {
+                imageUri = AzureBlobModule.getFriendUserProfileImageUrl(participantUser.Id, 1);
+            }
+            else if (participantFriend.profile_image_2_active)
+            {
+                imageUri = AzureBlobModule.getFriendUserProfileImageUrl(participantUser.Id, 2);
+            }
+
+            //add image
+            participantContainer.Add(new JProperty("image_uri", imageUri));
 
             //add profile image link (however it is got in the profile image manager, either we store the link or we get it because its the same)
 

@@ -123,16 +123,19 @@ namespace POPNetwork.Models
             //other user id
             [Required(ErrorMessage = "Other User Id Required")]
             [Display(Name = "other_id")]
+            [StringLength(1024)]
             public string other_id { get; set; }
 
             //body of direct message
             [Required(ErrorMessage = "Body of Message Required")]
             [Display(Name = "body")]
+            [StringLength(1024)]
             public string body { get; set; }
 
             //body of direct message
             [Required(ErrorMessage = "Expo Token")]
             [Display(Name = "expo_token")]
+            [StringLength(1024)]
             public string expo_token { get; set; }
         }
 
@@ -141,16 +144,19 @@ namespace POPNetwork.Models
             //other user id
             [Required(ErrorMessage = "Other User Id Required")]
             [Display(Name = "other_id")]
+            [StringLength(1024)]
             public string conversation_id { get; set; }
 
             //body of direct message
             [Required(ErrorMessage = "Body of Message Required")]
             [Display(Name = "body")]
+            [StringLength(1024)]
             public string body { get; set; }
 
             //body of direct message
             [Required(ErrorMessage = "Expo Token")]
             [Display(Name = "expo_token")]
+            [StringLength(1024)]
             public string expo_token { get; set; }
         }
 
@@ -159,15 +165,18 @@ namespace POPNetwork.Models
             //body of accouncement
             [Required(ErrorMessage = "Activity Id Required")]
             [Display(Name = "activity_id")]
+            [StringLength(1024)]
             public string activity_id { get; set; }
 
             //body of accouncement
             [Required(ErrorMessage = "Announcement Message Required")]
             [Display(Name = "message")]
+            [StringLength(1024)]
             public string message { get; set; }
 
             [Required(ErrorMessage = "Expo Token Required")]
             [Display(Name = "expo_token")]
+            [StringLength(1024)]
             public string expo_token { get; set; }
         }
     }

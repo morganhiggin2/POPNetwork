@@ -87,7 +87,12 @@ public class IdentityController : ControllerBase
                 //add expo token
                 MessageModule.addExpoToken(_context, user, model.expo_token);
 
-                return Ok();
+                //return the user_id
+                JObject masterContainer = new JObject();
+
+                masterContainer.Add(new JProperty("user_id", user.Id));
+
+                return Content(masterContainer.ToString(Newtonsoft.Json.Formatting.None), "application/json");
             }
             //if locked out, return 400 error with message
             else if (signInResult.IsLockedOut)

@@ -15,6 +15,19 @@ public class Program
 
     private static IWebHostBuilder CreateWebHostBuilder(string[] args) {
 
+        /*POPNetwork.Startup.externalConfiguration = new ConfigurationBuilder()
+            .SetBasePath(System.IO.Directory.GetCurrentDirectory())
+            .AddJsonFile("runtimevariables.json")
+            .Build();
+
+        IWebHostBuilder hostBuilder = WebHost.CreateDefaultBuilder(args)
+        .UseKestrel(options =>
+        {
+            
+        })
+        //.UseIISIntegration()
+        .UseStartup<Startup>();*/
+
         POPNetwork.Startup.externalConfiguration = new ConfigurationBuilder()
             .SetBasePath(System.IO.Directory.GetCurrentDirectory())
             .AddJsonFile("runtimevariables.json")
@@ -35,13 +48,10 @@ public class Program
         //.UseIISIntegration()
         .UseUrls("https://localhost:5001", "https://locahost:80", "https://localhost:5000", "https://localhost:443")
         .UseStartup<Startup>();
+         
 
-        /*.ConfigureAppConfiguration((hostingContext, config) =>
-        {
-            config.AddJsonFile("externalappsettings.json");
-        });*/
         //192.168.1.79
-            
+
         return hostBuilder;
     }
 }

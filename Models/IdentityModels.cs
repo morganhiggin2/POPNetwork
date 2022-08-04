@@ -61,21 +61,25 @@ public class RegisterModelView
 {
     [Required(ErrorMessage = "Username Required")]
     [Display(Name = "Username")]
+    [StringLength(1024)]
     public string username { get; set; }
 
     [Required(ErrorMessage = "Email Required")]
     [DataType(DataType.EmailAddress)]
     [Display(Name = "Email")]
+    [StringLength(1024)]
     public string email { get; set; }
 
     [Required(ErrorMessage = "Password Required")]
     [DataType(DataType.Password)]
     [Display(Name = "Password")]
+    [StringLength(1024)]
     public string password { get; set; }
 
     [Required(ErrorMessage = "Expo Token Required")]
     [DataType(DataType.Password)]
     [Display(Name = "Expo Token")]
+    [StringLength(1024)]
     public string expo_token { get; set; }
 }
 
@@ -83,16 +87,19 @@ public class LoginModelView
 {
     [Required(ErrorMessage = "Username Required")]
     [Display(Name = "Username")]
+    [StringLength(1024)]
     public string Username { get; set; }
 
     [Required(ErrorMessage = "Password Required")]
     [DataType(DataType.Password)]
     [Display(Name = "Password")]
+    [StringLength(1024)]
     public string Password { get; set; }
 
     [Required(ErrorMessage = "Expo Token Required")]
     [DataType(DataType.Password)]
     [Display(Name = "Expo Token")]
+    [StringLength(1024)]
     public string expo_token { get; set; }
 }
 
@@ -125,12 +132,15 @@ public class VerifyEmailKeyCode
 public class UpdateUserInformationModel
 {
     [Display(Name = "name")]
+    [StringLength(1024)]
     public string? name { get; set; }
 
     [Display(Name = "gender")]
+    [StringLength(1024)]
     public string? gender { get; set; }
 
     [Display(Name = "birthdate")]
+    [StringLength(1024)]
     public string? birthdate { get; set; }
 }
 
@@ -138,6 +148,7 @@ public class ResetEmailModel
 {
     [Display(Name = "email")]
     [DataType(DataType.EmailAddress)]
+    [StringLength(1024)]
     public string? email { get; set; }
 }
 
@@ -145,14 +156,22 @@ public class ResetPasswordUnauthorizedModel
 {
     [Required(ErrorMessage = "Old Password Required")]
     [DataType(DataType.Password)]
+    [StringLength(1024)]
     public string old_password { get; set; }
 
     [Required(ErrorMessage = "New Password Required")]
     [DataType(DataType.Password)]
+    [StringLength(1024)]
     public string new_password { get; set; }
 
+    [Required(ErrorMessage = "Password Token Required")]
+    [DataType(DataType.Password)]
+    [StringLength(1024)]
     public string password_reset_token { get; set; }
 
+    [Required(ErrorMessage = "Username Required")]
+    [DataType(DataType.Password)]
+    [StringLength(1024)]
     public string username { get; set; }
 }
 
@@ -160,10 +179,12 @@ public class ResetPasswordAuthorizedModel
 {
     [Required(ErrorMessage = "Old Password Required")]
     [DataType(DataType.Password)]
+    [StringLength(1024)]
     public string old_password { get; set; }
 
     [Required(ErrorMessage = "New Password Required")]
     [DataType(DataType.Password)]
+    [StringLength(1024)]
     public string new_password { get; set; }
 }
 

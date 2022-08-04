@@ -373,15 +373,19 @@ public class FriendActivityDynamicValues
 public class UpdateFriendUserInformationModel
 {
     [Display(Name = "name")]
+    [StringLength(1024)]
     public string? name { get; set; }
 
     [Display(Name = "gender")]
+    [StringLength(1024)]
     public string? gender { get; set; }
 
     [Display(Name = "birthdate")]
+    [StringLength(1024)]
     public string? birthdate { get; set; }
 
     [Display(Name = "description")]
+    [StringLength(1024)]
     public string? description { get; set; }
 
     [Display(Name = "attributes")]
@@ -404,6 +408,7 @@ public class SetDescriptionModel
 {
     [Required(ErrorMessage = "Description Required")]
     [Display(Name = "description")]
+    [StringLength(1024)]
     public string description { get; set; }
 }
 
@@ -411,6 +416,7 @@ public class SetBirthDateModel
 {
     [Required(ErrorMessage = "Birthdate Required")]
     [Display(Name = "birth_date")]
+    [StringLength(1024)]
     public string birthdate { get; set; }
 }
 
@@ -418,6 +424,7 @@ public class AttributeModel
 {
     [Required(ErrorMessage = "Attribute Required")]
     [Display(Name = "attribute")]
+    [StringLength(1024)]
     public string attribute { get; set; }
 }
 
@@ -425,6 +432,7 @@ public class GetUserInformationModel
 {
     [Required(ErrorMessage = "Username Required")]
     [Display(Name = "Username")]
+    [StringLength(1024)]
     public string username { get; set; }
 }
 
@@ -459,6 +467,7 @@ public class GetFriendUsersModel
 
     //[Required(ErrorMessage = "Gender Required")]
     [Display(Name = "gender")]
+    [StringLength(1024)]
     public string? gender { get; set; }
 
     [Display(Name = "attributes")]
@@ -486,6 +495,7 @@ public class GetFriendUserMapModel
 
     //[Required(ErrorMessage = "Gender Required")]
     [Display(Name = "gender")]
+    [StringLength(1024)]
     public string? gender { get; set; }
 
     [Display(Name = "attributes")]
@@ -496,9 +506,11 @@ public class CreateFriendActivityModel
 {
     [Required(ErrorMessage = "Title Required")]
     [Display(Name = "title")]
+    [StringLength(1024)]
     public string title { get; set; }
 
     [Display(Name = "description")]
+    [StringLength(1024)]
     public string? description { get; set; }
 
     [Required(ErrorMessage = "Attributes Required")]
@@ -507,6 +519,7 @@ public class CreateFriendActivityModel
 
     [Required(ErrorMessage = "Date Required")]
     [Display(Name = "datetime")]
+    [StringLength(1024)]
     public string date_time { get; set; }
 
     [Required(ErrorMessage = "Is Physical Event")]
@@ -523,9 +536,11 @@ public class CreateFriendActivityModel
     public double? search_radius { get; set; }
 
     [Display(Name = "address")]
+    [StringLength(1024)]
     public string address { get; set; }
 
     [Display(Name = "invitation_method")]
+    [StringLength(1024)]
     public string invitation_method { get; set; }
 
     [Display(Name = "invite_cap")]
@@ -535,6 +550,7 @@ public class CreateFriendActivityModel
     public int? participants_cap { get; set; }
 
     [Display(Name = "gender")]
+    [StringLength(1024)]
     public string? gender { get; set; }
 
     [Required(ErrorMessage = "Minimum Age Required")]
@@ -553,18 +569,22 @@ public class UpdateFriendActivityModel
 {
     [Required(ErrorMessage = "Activity Id Required")]
     [Display(Name = "id")]
+    [StringLength(1024)]
     public string id { get; set; }
 
     [Display(Name = "title")]
+    [StringLength(1024)]
     public string? title { get; set; }
 
     [Display(Name = "description")]
+    [StringLength(1024)]
     public string? description { get; set; }
 
     [Display(Name = "attributes")]
     public List<string>? attributes { get; set; }
 
     [Display(Name = "datetime")]
+    [StringLength(1024)]
     public string? date_time { get; set; }
 
     [Display(Name = "is_physical_event")]
@@ -580,9 +600,11 @@ public class UpdateFriendActivityModel
     public double? search_radius { get; set; }
 
     [Display(Name = "address")]
+    [StringLength(1024)]
     public string? address { get; set; }
 
     [Display(Name = "invitation_method")]
+    [StringLength(1024)]
     public string? invitation_method { get; set; }
 
     [Display(Name = "invite_cap")]
@@ -592,6 +614,7 @@ public class UpdateFriendActivityModel
     public int? participants_cap { get; set; }
 
     [Display(Name = "gender")]
+    [StringLength(1024)]
     public string? gender { get; set; }
 
     [Display(Name = "minimum_age")]
@@ -632,6 +655,7 @@ public class GetFriendActivitiesModel
     public List<string>? attributes { get; set; }
 
     [Display(Name = "medium")]
+    [StringLength(1024)]
     public string? medium { get; set; }
 }
 
@@ -649,6 +673,7 @@ public class GetFriendActivitiesMapModel
     public List<string>? attributes { get; set; }
 
     [Display(Name = "medium")]
+    [StringLength(1024)]
     public string? medium { get; set; }
 }
 
@@ -884,5 +909,6 @@ public class SendFeedbackModel
 {
     [Required(ErrorMessage = "Feedback Required")]
     [Display(Name = "feedback")]
+    [StringLength(4096)]
     public string feedback { get; set; }
 }
