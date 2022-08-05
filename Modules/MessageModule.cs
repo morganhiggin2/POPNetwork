@@ -724,6 +724,7 @@ namespace POPNetwork.Modules
                 return new Pair<bool, string>(false, totalError);
             }
 
+            /*
             List<string> receiptIds = results.Second;
             
             //add receipt ids to messages
@@ -733,7 +734,7 @@ namespace POPNetwork.Modules
                 {
                     friendUserMessages[i].recieptId = receiptIds[i];
                 }
-            }
+            }*/
 
             //if the message is received immediatly, the friendUserMessage will have been deleted
             //so account for the error
@@ -875,7 +876,7 @@ namespace POPNetwork.Modules
             }
             
             //add receipt ids to messages
-            List<string> receiptIds = results.Second;
+            /*List<string> receiptIds = results.Second;
             
             //add receipt ids to messages
             for (int i = 0; i < friendUserMessages.Count; i++)
@@ -884,7 +885,7 @@ namespace POPNetwork.Modules
                 {
                     friendUserMessages[i].recieptId = receiptIds[i];
                 }
-            }
+            }*/
 
             //if the message is received immediatly, the friendUserMessage will have been deleted
             //so account for the error
@@ -993,7 +994,7 @@ namespace POPNetwork.Modules
                 return new Pair<bool, string>(false, totalError);
             }
 
-            List<string> receiptIds = results.Second;
+            /*List<string> receiptIds = results.Second;
             
             //add receipt ids to messages
             for (int i = 0; i < friendUserMessages.Count; i++)
@@ -1002,7 +1003,7 @@ namespace POPNetwork.Modules
                 {
                     friendUserMessages[i].recieptId = receiptIds[i];
                 }
-            }
+            }*/
 
             //if the message is received immediatly, the friendUserMessage will have been deleted
             //so account for the error
@@ -1067,7 +1068,7 @@ namespace POPNetwork.Modules
                 return new Pair<bool, string>(false, totalError);
             }
             
-            List<string> receiptIds = results.Second;
+            /*List<string> receiptIds = results.Second;
             
             //add receipt ids to messages
             for (int i = 0; i < friendUserMessages.Count; i++)
@@ -1076,7 +1077,7 @@ namespace POPNetwork.Modules
                 {
                     friendUserMessages[i].recieptId = receiptIds[i];
                 }
-            }
+            }*/
 
             //if the message is received immediatly, the friendUserMessage will have been deleted
             //so account for the error
