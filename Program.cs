@@ -15,6 +15,42 @@ public class Program
 
     private static IWebHostBuilder CreateWebHostBuilder(string[] args) {
 
+    #if DEBUG
+        POPNetwork.Startup.externalConfiguration = new ConfigurationBuilder()
+        .SetBasePath(System.IO.Directory.GetCurrentDirectory())
+        .AddJsonFile("runtimevariables.json")
+        .Build();
+
+        IWebHostBuilder hostBuilder = WebHost.CreateDefaultBuilder(args)
+        .UseKestrel(options =>
+        {
+            options.ListenAnyIP(80, listenOptions =>
+            {
+                listenOptions.UseHttps("purpleorangepinkcert.pfx", "hallTo4$");
+            });
+            options.ListenAnyIP(443, listenOptions =>
+            {
+                listenOptions.UseHttps("purpleorangepinkcert.pfx", "hallTo4$");
+            });
+        })
+        //.UseIISIntegration()
+        .UseUrls("https://localhost:5001", "https://locahost:80", "https://localhost:5000", "https://localhost:443")
+        .UseStartup<Startup>();
+    #else
+            POPNetwork.Startup.externalConfiguration = new ConfigurationBuilder()
+                .SetBasePath(System.IO.Directory.GetCurrentDirectory())
+                .AddJsonFile("runtimevariables.json")
+                .Build();
+
+            IWebHostBuilder hostBuilder = WebHost.CreateDefaultBuilder(args)
+            .UseKestrel(options =>
+            {
+            
+            })
+            //.UseIISIntegration()
+            .UseStartup<Startup>();
+    #endif
+
         /*POPNetwork.Startup.externalConfiguration = new ConfigurationBuilder()
             .SetBasePath(System.IO.Directory.GetCurrentDirectory())
             .AddJsonFile("runtimevariables.json")
@@ -28,7 +64,7 @@ public class Program
         //.UseIISIntegration()
         .UseStartup<Startup>();*/
 
-        POPNetwork.Startup.externalConfiguration = new ConfigurationBuilder()
+        /*POPNetwork.Startup.externalConfiguration = new ConfigurationBuilder()
             .SetBasePath(System.IO.Directory.GetCurrentDirectory())
             .AddJsonFile("runtimevariables.json")
             .Build();
@@ -47,8 +83,8 @@ public class Program
         })
         //.UseIISIntegration()
         .UseUrls("https://localhost:5001", "https://locahost:80", "https://localhost:5000", "https://localhost:443")
-        .UseStartup<Startup>();
-         
+        .UseStartup<Startup>();*/
+
 
         //192.168.1.79
 

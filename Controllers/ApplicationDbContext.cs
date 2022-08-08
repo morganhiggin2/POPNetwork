@@ -36,7 +36,7 @@ public class ApplicationDbContext : IdentityDbContext//<ApplicationUser>
     public DbSet<FriendActivityAttribute> FriendActivityAttributes { get; set; }
 
     //friend activity points
-    public DbSet<FriendActivityPoint> friendActivityPoints { get; set; }
+    public DbSet<FriendActivityPoint> FriendActivityPoints { get; set; }
 
     //friend dynamic activity values
     public DbSet<FriendActivityDynamicValues> FriendActivitiesDynamicValues { get; set; }

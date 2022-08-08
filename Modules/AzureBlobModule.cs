@@ -66,7 +66,7 @@ public class AzureBlobModule
     public static async Task<Pair<bool, string>> uploadFriendUserProfileImage(ApplicationUser user, FriendUser friendUser, ApplicationDbContext context, IFormFile image, short profile_num)
     {
         //compile url
-        string fileName = "profile-image-" + profile_num.ToString() + ".jpg";
+        string fileName = "profile-image-" + profile_num.ToString() + ".png";
         string blobName = fileName;
 
         BlobContainerClient blobContainerClient = blobServiceClient.GetBlobContainerClient("friends-" + user.Id.ToString());
@@ -87,9 +87,18 @@ public class AzureBlobModule
 
         //get client for the container
         BlobClient blobClient = blobContainerClient.GetBlobClient(blobName);
-        //set content type to "image/jpg"
-        var blobHttpHeaders = new BlobHttpHeaders { ContentType = "image/jpg" };
 
+        //set content type to "image/jpg"
+        var blobHttpHeaders = new BlobHttpHeaders { ContentType = "image/png" };
+
+        //check if blob already exsits
+        if (blobClient.Exists())
+        {
+            //delete it
+            await blobClient.DeleteAsync();
+        }
+
+        //create the blob
         try
         {
             //open stream and upload image to azure blob
@@ -149,163 +158,6 @@ public class AzureBlobModule
 
         //https://popsocialstorage.blob.core.windows.net/
         //return ("https://blob." + baseDomain + "/friends-" + user_id + "/" +  "profile-image-" + profile_num.ToString() + ".jpg");
-        return ("https://popsocialstorage.blob.core.windows.net/friends-" + user_id + "/" + "profile-image-" + profile_num.ToString() + ".jpg");
+        return ("https://popsocialstorage.blob.core.windows.net/friends-" + user_id + "/" + "profile-image-" + profile_num.ToString() + ".png");
     }
-
-    //https://medium.com/a-techies-tidbits/image-upload-with-react-native-and-net-core-6ff6a41caec5
-
-    //upload image
-    //converting image formats
-    //check image formats in react native https://stackoverflow.com/questions/48854594/c-sharp-how-to-open-heic-image
-
-
-    //set mime type
-    //https://docs.microsoft.com/zh-cn/javascript/api/@azure/storage-blob/blobhttpheaders?view=azure-node-latest
-    //response.Content.Headers.ContentType = new MediaTypeHeaderValue("jpg"); 
-
-
-
-
-
-    /*
-     const blobServiceClient = BlobServiceClient.fromConnectionString(connectionstr)
-
-    const containerClient=blobServiceClient.getContainerClient('test')
-    const blobclient=containerClient.getBlockBlobClient('test.jpg')
-    let fileStream = fs.createReadStream('E:\\dog.jpg');
-    const blobOptions = { blobHTTPHeaders: { blobContentType: 'image/jpg' } };
-    blobclient.uploadStream(fileStream,undefined ,undefined ,blobOptions)
-     */
-
-    //blobClient.UploadStream(your_stream, overwrite: true);
-
-    //get status
-
-    //react native image crop picker reduce image size: maxWidth and maxHeight from the options.
-
-    /*
-     public static async Task<HttpResponseMessage> Run(
-    [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "files/{id}")]
-    HttpRequest req, string id, TraceWriter log)
-{
-    var account = CloudStorageAccount.Parse("UseDevelopmentStorage=true");
-    var client = account.CreateCloudBlobClient();
-    var container = client.GetContainerReference("sitecontent");
-    var blob = container.GetBlockBlobReference(id);
-
-    var stream = new MemoryStream();
-    await blob.DownloadToStreamAsync(stream);
-    stream.Seek(0, SeekOrigin.Begin);
-
-    HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
-    result.Content = new StreamContent(stream);
-    result.Content.Headers.ContentType =
-            new MediaTypeHeaderValue("application/octet-stream");
-
-    return result;
-}*/
 }
-
-//https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-dotnet?tabs=environment-variable-windows
-
-//maybe store main profile image also in lower resolution for easier and better downloading, but do that later in the program
-
-//https://docs.microsoft.com/en-us/dotnet/api/azure.storage.blobs?view=azure-dotnet
-//https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-dotnet
-
-//adding user: 
-
-//How to deal with difference of extensions for pictures (.jpg and .png)?
-
-//Format: https://myaccount.blob.core.windows.net/mycontainer/myblob
-
-//container name contains username, and in it contains all information for all realms
-
-//Endpoints
-//mycontainer = "Friends"
-//  profilepicture1.ext
-//  profilepicture2.ext
-//  ...
-
-/*
-To stream file to user, use 
-
-[Route("api/[controller]")]
-public class DownloadController : Controller {
-    //GET api/download/12345abc
-    [HttpGet("{id}")]
-    public async Task<IActionResult> Download(string id) {
-        Stream stream = await {{__get_stream_based_on_id_here__}}
-
-        if(stream == null)
-            return NotFound(); // returns a NotFoundResult with Status404NotFound response.
-
-        return File(stream, "application/octet-stream"); // returns a FileStreamResult
-    }    
-}
-
-
-    //upload activity image (s)
-    //called after AddFriendActivity
-    //adds images links (our custom ones) to it.
-
-    public async Task<IActionResult> UploadFriendActivityPhoto(IFormFile file) 
-    {
-        using (FileStream filestream = System.IO.File.Create(_environment.WebRootPath + "\\uploads\\" + files.files.FileName))
-        {
-            file.CopyTo();
-            filestream.Flush();
-            return "\\uploads\\" + files.files.FileName;
-        }
-
-        StorageCredentialscreden = newStorageCredentials(accountname, accesskey);
-
-        CloudStorageAccountacc = newCloudStorageAccount(creden, useHttps: true);
-
-        CloudBlobClient client = acc.CreateCloudBlobClient();
-
-        CloudBlobContainercont = client.GetContainerReference("mysample");
-
-        cont.CreateIfNotExists();
-
-        cont.SetPermissions(newBlobContainerPermissions
-
-
-        {
-
-            PublicAccess = BlobContainerPublicAccessType.Blob
-
-
-        });
-
-        CloudBlockBlobcblob = cont.GetBlockBlobReference("Sampleblob.jpg");
-
-        using (Stream file = System.IO.File.OpenRead(@ "D:\amit\Nitin sir\Nitinpandit.jpg"))
-
-        {
-
-            cblob.UploadFromStream(file);
-
-        }
-    }
-
-or with 
-
-return Redirect("http://www.google.com");
-
-for url files
-
-for uploading files, 
-
-https://stackoverflow.com/questions/63384025/uploading-a-pdf-file-to-azure-blob-storage-using-rest-api-c-sharp-without-usi
-
-https://docs.microsoft.com/en-us/dotnet/api/overview/azure/storage.common-readme
- 
-
-
-so for download files, use redirect
-
-for upload files, use the code above
-
-
- */

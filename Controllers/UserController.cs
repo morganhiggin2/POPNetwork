@@ -461,7 +461,7 @@ public class UserController : ControllerBase
     [Authorize]
     public async Task<IActionResult> AddFriendUserAttribute(AttributeModel model)
     {
-        //if attribute is null
+        //if attribute is nullf
         if (model.attribute == null)
         {
             return BadRequest("attribute is null");
@@ -477,14 +477,8 @@ public class UserController : ControllerBase
 
         FriendUser friendUser = user.friendUser;
 
-        //filter the string of the attribute
-        string attributeName = model.attribute;
-
-        //remove capital letters
-        attributeName = attributeName.ToLower();
-
-        //remove special characters
-        attributeName = Regex.Replace(attributeName, "[^a-z]+", "");
+        //get valid name
+        string attributeName = UserModule.getValidAttributeName(model.attribute);
 
         // check if attribute already exists
         FriendUserAttribute attribute = _context.FriendUserAttributes.Find(attributeName);
@@ -1441,7 +1435,7 @@ public class UserController : ControllerBase
         {
             friendActivity.searchLocation = new Point(model.search_location.longitude, model.search_location.latitude) { SRID = 4326 };
 
-            if (model.is_physical != null && model.is_physical == false)
+            if (!friendActivity.isPhysical)
             {
                 friendActivity.targetLocation = new Point(model.search_location.longitude, model.search_location.latitude) { SRID = 4326 };
             }
