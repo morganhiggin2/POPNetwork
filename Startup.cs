@@ -135,4 +135,6 @@ public class Startup : StartupBase
     }
 }
 
+//for windows: admin terminal -> "net stop http"
+
 //https://docs.microsoft.com/en-us/azure/app-service/configure-authentication-provider-aad

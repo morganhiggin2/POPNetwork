@@ -73,6 +73,9 @@ namespace POPNetwork.Modules
 
             //deactivate old friend activities
             UserModule.setNotActiveForOldActivities(_context);
+
+            //remove old locations
+            LocationModule.DeleteOldLocations(_context);
         }
 
         public static void fifteenMinuteTasks(ApplicationDbContext _context, UserManager<ApplicationUser> _userManager)

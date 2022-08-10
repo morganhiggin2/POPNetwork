@@ -428,6 +428,9 @@ public class UserController : ControllerBase
         if (model.location != null)
         {
             friendUser.location = new Point(model.location.longitude, model.location.latitude) { SRID = 4326 };
+
+            //update last active status
+            friendUser.lastActive = DateTime.Now;
         }
 
         //remove old points
@@ -670,7 +673,7 @@ public class UserController : ControllerBase
             jsonFriendUser.Add(new JProperty("type", "person"));
 
             //get distance to nearest mile
-            jsonFriendUser.Add(new JProperty("distance", Math.Floor(LocationModule.haversineDistance(searchLocation, tempUser.location))));
+            jsonFriendUser.Add(new JProperty("distance", Math.Floor(LocationModule.haversineDistance(friendUser.location, tempUser.location))));
 
             //add age
             jsonFriendUser.Add(new JProperty("age", tempUser.user.age));
@@ -1643,7 +1646,7 @@ public class UserController : ControllerBase
             jsonActivity.Add(new JProperty("type", "activity"));
 
             //get distance to nearest mile
-            jsonActivity.Add(new JProperty("distance", Math.Floor(LocationModule.haversineDistance(searchLocation, tempActivity.location))));
+            jsonActivity.Add(new JProperty("distance", Math.Floor(LocationModule.haversineDistance(friendUser.location, tempActivity.location))));
 
             //return when it will occur
             jsonActivity.Add(new JProperty("date_time", UserModule.getNeatDateTime(tempActivity.dateTime)));

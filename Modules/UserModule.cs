@@ -2,21 +2,15 @@
 using POPNetwork.Controllers;
 using POPNetwork.Models;
 using NetTopologySuite.Geometries;
-using Newtonsoft.Json.Linq;
-using static POPNetwork.Modules.LocationModule;
 using System.Collections.Generic;
 using System;
 using System.Linq;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 using static POPNetwork.Global.GlobalProperties;
 using Castle.Core;
 using System.Text.RegularExpressions;
 using System.Net.Mail;
 using System.Net;
-using static POPNetwork.Models.MessageModels;
 using Microsoft.Extensions.Configuration;
 
 namespace POPNetwork.Modules;
