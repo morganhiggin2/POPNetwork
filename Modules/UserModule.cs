@@ -908,7 +908,7 @@ public class UserModule
         name = name.ToLower();
 
         //remove special characters
-        name = Regex.Replace(name, "[^a-z]+", "");
+        name = Regex.Replace(name, "[^a-z0-9 ]+", "");
 
         return name;
     }

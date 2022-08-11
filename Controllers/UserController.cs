@@ -58,7 +58,7 @@ public class UserController : ControllerBase
 
         if (model.name != null)
         {
-            user.name = model.name.ToLower();
+            user.name = model.name;
         }
 
         if (model.gender != null)
@@ -321,7 +321,7 @@ public class UserController : ControllerBase
 
         if (model.name != null)
         {
-            user.name = model.name.ToLower();
+            user.name = model.name;
         }
 
         if (model.gender != null)
