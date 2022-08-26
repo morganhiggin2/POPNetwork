@@ -1417,11 +1417,8 @@ public class UserController : ControllerBase
 
             friendActivity.dateTime = date;
 
-            //if too old
-            if (date < DateTime.Now.AddDays(-1))
-            {
-                UserModule.checkIsActiveConditionsFriendActivity(friendActivity);
-            }
+            //reassess is active conditions
+            UserModule.checkIsActiveConditionsFriendActivity(friendActivity);
         }
 
         if (model.is_physical != null)
