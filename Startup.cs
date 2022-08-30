@@ -63,6 +63,9 @@ public class Startup : StartupBase
         //start azure blob connection
         AzureBlobModule.init();
 
+        //for testing user @deletewhentestingisdone
+        TestingModule.init();
+
         /*
 
         app.UseRouting(routes =>

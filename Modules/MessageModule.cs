@@ -1399,6 +1399,10 @@ namespace POPNetwork.Modules
 
             IdentityModule.SafelySaveChanges(context);
 
+            //for testing user @deletewhentestingisdone
+            JArray testingMessages = TestingModule.getMessages(context, userManager, user, expoToken);
+            messagesArrayContainer.Merge(testingMessages);
+
             return messagesArrayContainer;
         }
 
@@ -1417,3 +1421,23 @@ namespace POPNetwork.Modules
 //sends a message, it send a message to the other expo token of the other device 
 //of itself sending it to another person. When it pulls that it adds it to it's 
 //chat database
+
+/*
+
+//have way to change globalvariable at runtime to turn off this feature without republish?
+
+if user is admin 
+and new expo token
+  set global variable to true
+
+if getting pending messagse
+populate with fake messages
+set global variable to false
+
+-direct, from bob
+-conversation, from shared activity with bob
+-invitation, requesting to join bob's other activity (still pending)
+  -two invitations, one for accept, and one for reject
+-announcement, from shared actiivty with bob
+
+ */
