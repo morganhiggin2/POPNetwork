@@ -2257,6 +2257,12 @@ public class UserController : ControllerBase
             return BadRequest("User is blocked from activity");
         }
 
+        //check if user blocked activity
+        if (_context.FriendUserFriendActivityBlocks.Where(b => b.friendUserId == friendUser.ApplicationUserId && b.friendActivityId == friendActivity.id).Any())
+        {
+            return BadRequest("User blocked this activity");
+        }
+
         //create master container
         JObject masterContainer = new JObject();
 
@@ -2971,7 +2977,7 @@ public class UserController : ControllerBase
     /// <returns></returns>
     [HttpGet("Friends/Block/ActivityUser")]
     [Authorize]
-    public async Task<IActionResult> FriendUserFriendActivityBlock(string activity_id, string user_id)
+    public async Task<IActionResult> FriendActivityFriendUserBlock(string activity_id, string user_id)
     {
         ApplicationUser user = await _userManager.GetUserAsync(this.User);
 
@@ -3015,6 +3021,74 @@ public class UserController : ControllerBase
         {
             //remove friend from activities participants
             friendActivity.participants.Remove(friendUser);
+
+            friendActivity.dynamicValues.numParticipants--;
+
+            //check if it can become active if it is currently not active
+            if (!friendActivity.isActive)
+            {
+                //get dynamic values, check active conditions
+                UserModule.checkIsActiveConditionsFriendActivity(friendActivity);
+            }
+        }
+
+        IdentityModule.SafelySaveChanges(_context);
+
+        if (!result.First)
+        {
+            return BadRequest(result.Second);
+        }
+        else
+        {
+            return Ok();
+        }
+    }
+
+    /// <summary>
+    /// friend user blocks friend activity
+    /// </summary>
+    /// <param name="activity_id"></param>
+    /// <param name="user_id"></param>
+    /// <returns></returns>
+    [HttpGet("Friends/Block/UserActivity")]
+    [Authorize]
+    public async Task<IActionResult> FriendUserFriendActivityBlock(string activity_id)
+    {
+        ApplicationUser user = await _userManager.GetUserAsync(this.User);
+
+        //if user does not exists
+        if (user == null)
+        {
+            return BadRequest();
+        }
+
+        FriendUser currentFriendUser = user.friendUser;
+
+        if (currentFriendUser == null)
+        {
+            return BadRequest("Friend user not found");
+        }
+
+        if (currentFriendUser == null)
+        {
+            return BadRequest("Current friend user is null");
+        }
+
+        FriendActivity friendActivity = _context.FriendActivities.Find(activity_id);
+
+        if (currentFriendUser.createdActivities.Contains(friendActivity))
+        {
+            return BadRequest("Friend user is admin of activity");
+        }
+
+        Pair<bool, string> result = UserModule.FriendUserFriendActivityBlock(_context, friendActivity, currentFriendUser);
+
+        //remove parson from activity as participant if they are in it
+        //continue removing if they were found
+        if (currentFriendUser.participatingActivities.Remove(friendActivity))
+        {
+            //remove friend from activities participants
+            friendActivity.participants.Remove(currentFriendUser);
 
             friendActivity.dynamicValues.numParticipants--;
 
@@ -3119,6 +3193,204 @@ public class UserController : ControllerBase
         //report user and get result
         Pair<bool, string> result = UserModule.FriendUserFriendUserReport(_context, _userManager, _signInManager, currentFriendUser, otherFriendUser);
         
+        IdentityModule.SafelySaveChanges(_context);
+
+        if (!result.First)
+        {
+            return BadRequest(result.Second);
+        }
+        else
+        {
+            return Ok();
+        }
+    }
+
+    /// <summary>
+    /// current friend user reports other friend activity
+    /// </summary>
+    /// <param name="user_id"></param>
+    /// <returns></returns>
+    [HttpGet("Friends/Report/Activity")]
+    [Authorize]
+    public async Task<IActionResult> FriendUserFriendActivityReport(string activity_id)
+    {
+        ApplicationUser user = await _userManager.GetUserAsync(this.User);
+
+        //if user does not exists
+        if (user == null)
+        {
+            return BadRequest();
+        }
+
+        FriendUser currentFriendUser = user.friendUser;
+
+        if (currentFriendUser == null)
+        {
+            return BadRequest("Current friend user is null");
+        }
+
+        FriendActivity otherFriendActivity = _context.FriendActivities.Find(activity_id);
+
+        if (otherFriendActivity == null)
+        {
+            return BadRequest("Friend activity to report was not found");
+        }
+
+        //report user and get result
+        Pair<bool, string> result = UserModule.FriendUserFriendActivityReport(_context, currentFriendUser, otherFriendActivity);
+
+        IdentityModule.SafelySaveChanges(_context);
+
+        if (!result.First)
+        {
+            return BadRequest(result.Second);
+        }
+        else
+        {
+            return Ok();
+        }
+    }
+
+    /// <summary>
+    /// current friend user reports other friend user direct message
+    /// </summary>
+    /// <param name="user_id"></param>
+    /// <returns></returns>
+    [HttpGet("Friends/Report/DirectMessage")]
+    [Authorize]
+    public async Task<IActionResult> FriendUserFriendDirectMessageReport(string user_id, string content)
+    {
+        ApplicationUser user = await _userManager.GetUserAsync(this.User);
+
+        //if user does not exists
+        if (user == null)
+        {
+            return BadRequest();
+        }
+
+        FriendUser currentFriendUser = user.friendUser;
+
+        if (currentFriendUser == null)
+        {
+            return BadRequest("Current friend user is null");
+        }
+
+        FriendUser otherFriendUser = _context.FriendUsers.Find(user_id);
+
+        if (otherFriendUser == null)
+        {
+            return BadRequest("Friend user to report was not found");
+        }
+
+        //report user and get result
+        Pair<bool, string> result = UserModule.FriendUserFriendDirectMessageReport(_context, currentFriendUser, otherFriendUser, content);
+
+        IdentityModule.SafelySaveChanges(_context);
+
+        if (!result.First)
+        {
+            return BadRequest(result.Second);
+        }
+        else
+        {
+            return Ok();
+        }
+    }
+
+    /// <summary>
+    /// current friend user reports other friend conversation
+    /// </summary>
+    /// <param name="user_id"></param>
+    /// <returns></returns>
+    [HttpGet("Friends/Report/Conversation")]
+    [Authorize]
+    public async Task<IActionResult> FriendUserFriendConversationReport(string conversation_id, string content)
+    {
+        ApplicationUser user = await _userManager.GetUserAsync(this.User);
+
+        //if user does not exists
+        if (user == null)
+        {
+            return BadRequest();
+        }
+
+        FriendUser currentFriendUser = user.friendUser;
+
+        if (currentFriendUser == null)
+        {
+            return BadRequest("Current friend user is null");
+        }
+
+        ConversationBase conversationBase = _context.ConversationBases.Find(conversation_id);
+
+        if (conversationBase == null)
+        {
+            return BadRequest("conversation to report was not found");
+        }
+
+        Pair<bool, string> result = new Pair<bool, string>(false, "conversation type does not exist");
+
+        if (conversationBase.descriminator == "FriendActivityConversation")
+        {
+            FriendActivityConversation friendActivityConversation = (FriendActivityConversation) conversationBase;
+
+            FriendActivity otherFriendActivity = friendActivityConversation.friendActivity;
+
+            if (otherFriendActivity == null)
+            {
+                _context.FriendActivityConversations.Remove(friendActivityConversation);
+            }
+
+            //report activity and get result
+            result = UserModule.FriendUserFriendConversationReport(_context, currentFriendUser, conversationBase, content);
+        }
+
+        IdentityModule.SafelySaveChanges(_context);
+
+        if (!result.First)
+        {
+            return BadRequest(result.Second);
+        }
+        else
+        {
+            return Ok();
+        }
+    }
+
+
+    /// <summary>
+    /// current friend user reports other friend conversation
+    /// </summary>
+    /// <param name="user_id"></param>
+    /// <returns></returns>
+    [HttpGet("Friends/Report/Announcement")]
+    [Authorize]
+    public async Task<IActionResult> FriendUserFriendAnnouncementReport(string activity_id, string content)
+    {
+        ApplicationUser user = await _userManager.GetUserAsync(this.User);
+
+        //if user does not exists
+        if (user == null)
+        {
+            return BadRequest();
+        }
+
+        FriendUser currentFriendUser = user.friendUser;
+
+        if (currentFriendUser == null)
+        {
+            return BadRequest("Current friend user is null");
+        }
+
+        FriendActivity otherFriendActivity = _context.FriendActivities.Find(activity_id);
+
+        if (otherFriendActivity == null)
+        {
+            return BadRequest("Friend activity to report was not found");
+        }
+
+        Pair<bool, string> result = UserModule.FriendUserFriendActivityAnnouncementReport(_context, currentFriendUser, otherFriendActivity, content);
+
         IdentityModule.SafelySaveChanges(_context);
 
         if (!result.First)

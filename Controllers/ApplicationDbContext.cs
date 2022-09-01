@@ -55,6 +55,7 @@ public class ApplicationDbContext : IdentityDbContext//<ApplicationUser>
     public DbSet<FriendActivityToFriendActivityInvitation> FriendActivityToFriendActivityInvitations { get; set; }
     public DbSet<FriendActivityFriendUserBlock> FriendActivityFriendUserBlocks { get; set; }
     public DbSet<FriendUserFriendUserBlock> FriendUserFriendUserBlocks { get; set; }
+    public DbSet<FriendUserFriendActivityBlock> FriendUserFriendActivityBlocks { get; set; }
     public DbSet<ResetPasswordKeyCode> ResetPasswordKeyCodes { get; set; }
     public DbSet<VerifyEmailKeyCode> VerifyEmailKeyCodes { get; set; }
 

@@ -871,7 +871,6 @@ public class CasualUser
     public Boolean active { get; set; }
 }
 
-//TODO add in delete methods
 [Index(nameof(friendUserFirstId), nameof(friendUserLastId))]
 public class FriendUserFriendUserBlock
 {
@@ -888,7 +887,6 @@ public class FriendUserFriendUserBlock
     public string friendUserLastId { get; set; }
 }
 
-//TODO add in delete methods
 [Index(nameof(friendActivityId), nameof(friendUserId))]
 public class FriendActivityFriendUserBlock
 {
@@ -903,6 +901,23 @@ public class FriendActivityFriendUserBlock
     public virtual FriendUser friendUser { get; set; }
 
     public string friendUserId { get; set; }   
+}
+
+//TODO add in delete methods
+[Index(nameof(friendActivityId), nameof(friendUserId))]
+public class FriendUserFriendActivityBlock
+{
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public string id { get; set; }
+
+    public virtual FriendActivity friendActivity { get; set; }
+
+    public string friendActivityId { get; set; }
+
+    public virtual FriendUser friendUser { get; set; }
+
+    public string friendUserId { get; set; }
 }
 
 public class SendFeedbackModel

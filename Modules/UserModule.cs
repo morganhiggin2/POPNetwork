@@ -12,6 +12,8 @@ using System.Text.RegularExpressions;
 using System.Net.Mail;
 using System.Net;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
+using static POPNetwork.Models.MessageModels;
 
 namespace POPNetwork.Modules;
 public class UserModule
@@ -120,6 +122,11 @@ public class UserModule
         foreach (FriendActivityFriendUserBlock block in context.FriendActivityFriendUserBlocks.Where(b => (b.friendUserId == friendUser.ApplicationUserId)).ToList())
         {
             context.FriendActivityFriendUserBlocks.Remove(block);
+        }
+
+        foreach (FriendUserFriendActivityBlock block in context.FriendUserFriendActivityBlocks.Where(b => (b.friendUserId == friendUser.ApplicationUserId)).ToList())
+        {
+            context.FriendUserFriendActivityBlocks.Remove(block);
         }
 
         /*//remove pending messages
@@ -347,6 +354,11 @@ public class UserModule
                 foreach (FriendActivityFriendUserBlock block in context.FriendActivityFriendUserBlocks.Where(b => (b.friendActivityId == friendActivity.id)).ToList())
                 {
                     context.Remove(block);
+                }
+
+                foreach (FriendUserFriendActivityBlock block in context.FriendUserFriendActivityBlocks.Where(b => (b.friendActivityId == friendActivity.id)).ToList())
+                {
+                    context.FriendUserFriendActivityBlocks.Remove(block);
                 }
 
                 //remove from attributes
@@ -1635,7 +1647,12 @@ public class UserModule
             //remove blocks
             foreach (FriendActivityFriendUserBlock block in context.FriendActivityFriendUserBlocks.Where(b => (b.friendActivityId == friendActivity.id)).ToList())
             {
-                context.Remove(block);
+                context.FriendActivityFriendUserBlocks.Remove(block);
+            }
+
+            foreach (FriendUserFriendActivityBlock block in context.FriendUserFriendActivityBlocks.Where(b => (b.friendActivityId == friendActivity.id)).ToList())
+            {
+                context.FriendUserFriendActivityBlocks.Remove(block);
             }
 
             //remove corresponding activity dynamics value entry
@@ -1715,6 +1732,35 @@ public class UserModule
 
         //check if block already exists
         List<FriendActivityFriendUserBlock> blocks = context.FriendActivityFriendUserBlocks.Where(b => (b.friendActivityId == friendActivity.id && b.friendUserId == friendUser.ApplicationUserId)).ToList();
+
+        if (blocks.Count != 0)
+        {
+            return new Pair<bool, string>(false, "Block already exists");
+        }
+
+        //add links
+        block.friendActivity = friendActivity;
+        block.friendUser = friendUser;
+
+        //add to context
+        context.Add(block);
+
+        return new Pair<bool, string>(true, "");
+    }
+
+    /// <summary>
+    /// adds friend activity friend user block
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="friendActivity"></param>
+    /// <param name="friendUser"></param>
+    /// <returns></returns>
+    public static Pair<bool, string> FriendUserFriendActivityBlock(ApplicationDbContext context, FriendActivity friendActivity, FriendUser friendUser)
+    {
+        FriendUserFriendActivityBlock block = new FriendUserFriendActivityBlock();
+
+        //check if block already exists
+        List<FriendUserFriendActivityBlock> blocks = context.FriendUserFriendActivityBlocks.Where(b => (b.friendActivityId == friendActivity.id && b.friendUserId == friendUser.ApplicationUserId)).ToList();
 
         if (blocks.Count != 0)
         {
@@ -1848,6 +1894,93 @@ public class UserModule
         //get parameters
         double reportLimit = Startup.externalConfiguration.GetSection("InternalParameters").GetValue<double>("REPORT_LIMIT");
 
+        //block other user
+        UserModule.FriendUserFriendUserBlock(context, currentFriendUser, otherFriendUser);
+
+        //send email to support about user
+
+        JObject materContainer = new JObject();
+
+        //get id
+        materContainer.Add(new JProperty("user_id", otherFriendUser.ApplicationUserId));
+
+        //get name
+        materContainer.Add(new JProperty("name", otherFriendUser.user.name));
+
+        //get username
+        materContainer.Add(new JProperty("username", otherFriendUser.user.UserName));
+
+        //get description
+        materContainer.Add(new JProperty("description", otherFriendUser.description));
+
+        JArray attributesArray = new JArray();
+
+        foreach(string attr in otherFriendUser.attributes.Select(c => c.name).ToList())
+        {
+            attributesArray.Add(attr);
+        }
+
+        //get attributes
+        materContainer.Add(new JProperty("attributes", attributesArray));
+
+        //get profile image uris
+        JArray profileImageUrisArray = new JArray();
+
+        if (otherFriendUser.profile_image_0_active)
+        {
+            profileImageUrisArray.Add(AzureBlobModule.getFriendUserProfileImageUrl(otherFriendUser.ApplicationUserId, 0));
+        }
+        if (otherFriendUser.profile_image_1_active)
+        {
+            profileImageUrisArray.Add(AzureBlobModule.getFriendUserProfileImageUrl(otherFriendUser.ApplicationUserId, 1));
+        }
+        if (otherFriendUser.profile_image_2_active)
+        {
+            profileImageUrisArray.Add(AzureBlobModule.getFriendUserProfileImageUrl(otherFriendUser.ApplicationUserId, 2));
+        }
+
+        //get picture uris
+        materContainer.Add(new JProperty("picture_uris", profileImageUrisArray));
+
+        //convert to string
+        string body = materContainer.ToString();
+
+        //send email from no-reply
+        //send email
+        //get parameters
+        string fromEmail = Startup.externalConfiguration.GetSection("EmailStrings").GetValue<string>("SupportEmail");
+        string fromPassword = Startup.externalConfiguration.GetSection("EmailStrings").GetValue<string>("SupportPassword");
+        string toEmail = fromEmail;
+
+        //create message
+        MailMessage message = new MailMessage(fromEmail, toEmail);
+
+        //set values
+        message.Subject = "POP User has been reported";
+        message.Body = body;
+
+        //create email object
+        SmtpClient client = new SmtpClient("smtp.gmail.com")
+        {
+            Port = 587,
+            Credentials = new NetworkCredential(fromEmail, fromPassword),
+            EnableSsl = true,
+        };
+
+        //set cridentials
+        client.UseDefaultCredentials = true;
+        client.Timeout = 5000;
+
+        try
+        {
+            client.Send(message);
+        }
+        catch (Exception ex)
+        {
+            return new Pair<bool, string>(false, "Could not send email");
+        }
+
+        /*
         //if this excedds the allowed number of reports
         if (dynamicValues.numberOfReports >= reportLimit)
         {
@@ -1898,7 +2031,241 @@ public class UserModule
             {
                 return new Pair<bool, string>(false, "Could not send email");
             }
+        }*/
+
+        return new Pair<bool, string>(true, "");
+    }
+
+    public static Pair<bool, string> FriendUserFriendActivityReport(ApplicationDbContext context, FriendUser currentFriendUser, FriendActivity otherFriendActivity)
+    {
+        //block other user
+        UserModule.FriendUserFriendActivityBlock(context, otherFriendActivity, currentFriendUser);
+
+        //send email to support about user
+
+        JObject materContainer = new JObject();
+
+        //get id
+        materContainer.Add(new JProperty("user_id", otherFriendActivity.id));
+
+        //get name
+        materContainer.Add(new JProperty("name", otherFriendActivity.name));
+
+        //get description
+        materContainer.Add(new JProperty("description", otherFriendActivity.description));
+
+        JArray attributesArray = new JArray();
+
+        foreach (string attr in otherFriendActivity.attributes.Select(c => c.name).ToList())
+        {
+            attributesArray.Add(attr);
         }
+
+        //get attributes
+        materContainer.Add(new JProperty("attributes", attributesArray));
+
+        //convert to string
+        string body = materContainer.ToString();
+
+        //send email from no-reply
+        //send email
+        //get parameters
+        string fromEmail = Startup.externalConfiguration.GetSection("EmailStrings").GetValue<string>("SupportEmail");
+        string fromPassword = Startup.externalConfiguration.GetSection("EmailStrings").GetValue<string>("SupportPassword");
+        string toEmail = fromEmail;
+
+        //create message
+        MailMessage message = new MailMessage(fromEmail, toEmail);
+
+        //set values
+        message.Subject = "POP Activity has been reported";
+        message.Body = body;
+
+        //create email object
+        SmtpClient client = new SmtpClient("smtp.gmail.com")
+        {
+            Port = 587,
+            Credentials = new NetworkCredential(fromEmail, fromPassword),
+            EnableSsl = true,
+        };
+
+        //set cridentials
+        client.UseDefaultCredentials = true;
+        client.Timeout = 5000;
+
+        try
+        {
+            client.Send(message);
+        }
+        catch (Exception ex)
+        {
+            return new Pair<bool, string>(false, "Could not send email");
+        }
+
+        return new Pair<bool, string>(true, "");
+    }
+
+    public static Pair<bool, string> FriendUserFriendDirectMessageReport(ApplicationDbContext context, FriendUser currentFriendUser, FriendUser otherFriendUser, string content)
+    {
+        //send email to support about user
+
+        JObject materContainer = new JObject();
+
+        //get id
+        materContainer.Add(new JProperty("user_id", otherFriendUser.ApplicationUserId));
+
+        //get name
+        materContainer.Add(new JProperty("name", otherFriendUser.user.name));
+
+        //get username
+        materContainer.Add(new JProperty("username", otherFriendUser.user.UserName));
+
+        //convert to string
+        string body = materContainer.ToString();
+
+        //send email from no-reply
+        //send email
+        //get parameters
+        string fromEmail = Startup.externalConfiguration.GetSection("EmailStrings").GetValue<string>("SupportEmail");
+        string fromPassword = Startup.externalConfiguration.GetSection("EmailStrings").GetValue<string>("SupportPassword");
+        string toEmail = fromEmail;
+
+        //create message
+        MailMessage message = new MailMessage(fromEmail, toEmail);
+
+        //set values
+        message.Subject = "POP Friend Direct Message has been reported";
+        message.Body = body + "\n content: \n " + content;
+
+        //create email object
+        SmtpClient client = new SmtpClient("smtp.gmail.com")
+        {
+            Port = 587,
+            Credentials = new NetworkCredential(fromEmail, fromPassword),
+            EnableSsl = true,
+        };
+
+        //set cridentials
+        client.UseDefaultCredentials = true;
+        client.Timeout = 5000;
+
+        try
+        {
+            client.Send(message);
+        }
+        catch (Exception ex)
+        {
+            return new Pair<bool, string>(false, "Could not send email");
+        }
+
+
+        return new Pair<bool, string>(true, "");
+    }
+
+    public static Pair<bool, string> FriendUserFriendConversationReport(ApplicationDbContext context, FriendUser currentFriendUser, ConversationBase conversationBase, string content)
+    {
+        //send email to support about user
+
+        JObject materContainer = new JObject();
+
+        //get id
+        materContainer.Add(new JProperty("conversation_id", conversationBase));
+
+        //get name
+        materContainer.Add(new JProperty("descriminator", conversationBase.descriminator));
+
+        //convert to string
+        string body = materContainer.ToString();
+
+        //send email from no-reply
+        //send email
+        //get parameters
+        string fromEmail = Startup.externalConfiguration.GetSection("EmailStrings").GetValue<string>("SupportEmail");
+        string fromPassword = Startup.externalConfiguration.GetSection("EmailStrings").GetValue<string>("SupportPassword");
+        string toEmail = fromEmail;
+
+        //create message
+        MailMessage message = new MailMessage(fromEmail, toEmail);
+
+        //set values
+        message.Subject = "POP Friend Conversation has been reported";
+        message.Body = body + "\n content: \n " + content;
+
+        //create email object
+        SmtpClient client = new SmtpClient("smtp.gmail.com")
+        {
+            Port = 587,
+            Credentials = new NetworkCredential(fromEmail, fromPassword),
+            EnableSsl = true,
+        };
+
+        //set cridentials
+        client.UseDefaultCredentials = true;
+        client.Timeout = 5000;
+
+        try
+        {
+            client.Send(message);
+        }
+        catch (Exception ex)
+        {
+            return new Pair<bool, string>(false, "Could not send email");
+        }
+
+
+        return new Pair<bool, string>(true, "");
+    }
+
+    public static Pair<bool, string> FriendUserFriendActivityAnnouncementReport(ApplicationDbContext context, FriendUser currentFriendUser, FriendActivity otherFriendActivity, string content)
+    {
+        //send email to support about user
+
+        JObject materContainer = new JObject();
+
+        //get id
+        materContainer.Add(new JProperty("user_id", otherFriendActivity.id));
+
+        //get name
+        materContainer.Add(new JProperty("name", otherFriendActivity.name));
+
+        //convert to string
+        string body = materContainer.ToString();
+
+        //send email from no-reply
+        //send email
+        //get parameters
+        string fromEmail = Startup.externalConfiguration.GetSection("EmailStrings").GetValue<string>("SupportEmail");
+        string fromPassword = Startup.externalConfiguration.GetSection("EmailStrings").GetValue<string>("SupportPassword");
+        string toEmail = fromEmail;
+
+        //create message
+        MailMessage message = new MailMessage(fromEmail, toEmail);
+
+        //set values
+        message.Subject = "POP Activity Announcement has been reported";
+        message.Body = body + "\n content: \n " + content;
+
+        //create email object
+        SmtpClient client = new SmtpClient("smtp.gmail.com")
+        {
+            Port = 587,
+            Credentials = new NetworkCredential(fromEmail, fromPassword),
+            EnableSsl = true,
+        };
+
+        //set cridentials
+        client.UseDefaultCredentials = true;
+        client.Timeout = 5000;
+
+        try
+        {
+            client.Send(message);
+        }
+        catch (Exception ex)
+        {
+            return new Pair<bool, string>(false, "Could not send email");
+        }
+
 
         return new Pair<bool, string>(true, "");
     }
