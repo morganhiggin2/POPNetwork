@@ -774,6 +774,39 @@ public class FriendActivitySearchModel
     }
 }
 
+public class FriendReportDirectMessageModel
+{
+    [Required(ErrorMessage = "User id Required")]
+    [Display(Name = "user_id")]
+    public string user_id { get; set; }
+
+    [Required(ErrorMessage = "content Required")]
+    [Display(Name = "content")]
+    public string content { get; set; }
+}
+
+public class FriendReportConversationModel
+{
+    [Required(ErrorMessage = "Conversation id Required")]
+    [Display(Name = "conversation_id")]
+    public string conversation_id { get; set; }
+
+    [Required(ErrorMessage = "content Required")]
+    [Display(Name = "content")]
+    public string content { get; set; }
+}
+
+public class FriendReportAnnouncementModel
+{
+    [Required(ErrorMessage = "Activity id Required")]
+    [Display(Name = "activity_id")]
+    public string activity_id { get; set; }
+
+    [Required(ErrorMessage = "content Required")]
+    [Display(Name = "content")]
+    public string content { get; set; }
+}
+
 public class FriendUserUploadProfileImageModel
 {
     [Required(ErrorMessage = "Image Required")]

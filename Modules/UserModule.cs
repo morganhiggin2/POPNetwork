@@ -1895,7 +1895,14 @@ public class UserModule
         double reportLimit = Startup.externalConfiguration.GetSection("InternalParameters").GetValue<double>("REPORT_LIMIT");
 
         //block other user
-        UserModule.FriendUserFriendUserBlock(context, currentFriendUser, otherFriendUser);
+        Pair<bool, string> result = UserModule.FriendUserFriendUserBlock(context, currentFriendUser, otherFriendUser);
+
+        if (!result.First)
+        {
+            return result;
+        }
+
+        IdentityModule.SafelySaveChanges(context);
 
         //send email to support about user
 
@@ -1945,31 +1952,26 @@ public class UserModule
         //convert to string
         string body = materContainer.ToString();
 
-        //send email from no-reply
         //send email
         //get parameters
         string fromEmail = Startup.externalConfiguration.GetSection("EmailStrings").GetValue<string>("SupportEmail");
         string fromPassword = Startup.externalConfiguration.GetSection("EmailStrings").GetValue<string>("SupportPassword");
         string toEmail = fromEmail;
 
-        //create message
         MailMessage message = new MailMessage(fromEmail, toEmail);
-
-        //set values
-        message.Subject = "POP User has been reported";
+        message.Subject = "POP Friend User has been reported";
         message.Body = body;
 
         //create email object
         SmtpClient client = new SmtpClient("smtp.gmail.com")
         {
             Port = 587,
-            Credentials = new NetworkCredential(fromEmail, fromPassword),
+            UseDefaultCredentials = false,
             EnableSsl = true,
+            DeliveryMethod = SmtpDeliveryMethod.Network,
+            Credentials = new NetworkCredential(fromEmail, fromPassword),
+            Timeout = 5000,
         };
-
-        //set cridentials
-        client.UseDefaultCredentials = true;
-        client.Timeout = 5000;
 
         try
         {
@@ -2015,8 +2017,11 @@ public class UserModule
             SmtpClient client = new SmtpClient("smtp.gmail.com")
             {
                 Port = 587,
-                Credentials = new NetworkCredential(fromEmail, fromPassword),
+                UseDefaultCredentials = false,
                 EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                Credentials = new NetworkCredential(fromEmail, fromPassword),
+                Timeout = 5000,
             };
 
             //set cridentials
@@ -2038,8 +2043,25 @@ public class UserModule
 
     public static Pair<bool, string> FriendUserFriendActivityReport(ApplicationDbContext context, FriendUser currentFriendUser, FriendActivity otherFriendActivity)
     {
+        if (otherFriendActivity.admins.Contains(currentFriendUser))
+        {
+            return new Pair<bool, string>(false, "Current user is an admin in this activity" );
+        }
+
+        if (otherFriendActivity.participants.Contains(currentFriendUser))
+        {
+            leaveActivityAsParticipant(context, currentFriendUser, otherFriendActivity);
+        }
+
         //block other user
-        UserModule.FriendUserFriendActivityBlock(context, otherFriendActivity, currentFriendUser);
+        Pair<bool, string> result = UserModule.FriendUserFriendActivityBlock(context, otherFriendActivity, currentFriendUser);
+
+        if (!result.First)
+        {
+            return result;
+        }
+
+        IdentityModule.SafelySaveChanges(context);
 
         //send email to support about user
 
@@ -2067,31 +2089,26 @@ public class UserModule
         //convert to string
         string body = materContainer.ToString();
 
-        //send email from no-reply
         //send email
         //get parameters
         string fromEmail = Startup.externalConfiguration.GetSection("EmailStrings").GetValue<string>("SupportEmail");
         string fromPassword = Startup.externalConfiguration.GetSection("EmailStrings").GetValue<string>("SupportPassword");
         string toEmail = fromEmail;
 
-        //create message
         MailMessage message = new MailMessage(fromEmail, toEmail);
-
-        //set values
-        message.Subject = "POP Activity has been reported";
+        message.Subject = "POP Friend Activity has been reported";
         message.Body = body;
 
         //create email object
         SmtpClient client = new SmtpClient("smtp.gmail.com")
         {
             Port = 587,
-            Credentials = new NetworkCredential(fromEmail, fromPassword),
+            UseDefaultCredentials = false,
             EnableSsl = true,
+            DeliveryMethod = SmtpDeliveryMethod.Network,
+            Credentials = new NetworkCredential(fromEmail, fromPassword),
+            Timeout = 5000,
         };
-
-        //set cridentials
-        client.UseDefaultCredentials = true;
-        client.Timeout = 5000;
 
         try
         {
@@ -2109,6 +2126,16 @@ public class UserModule
     {
         //send email to support about user
 
+        //block other user
+        Pair<bool, string> result = UserModule.FriendUserFriendUserBlock(context, currentFriendUser, otherFriendUser);
+
+        if (!result.First)
+        {
+            return result;
+        }
+
+        IdentityModule.SafelySaveChanges(context);
+
         JObject materContainer = new JObject();
 
         //get id
@@ -2123,14 +2150,12 @@ public class UserModule
         //convert to string
         string body = materContainer.ToString();
 
-        //send email from no-reply
         //send email
         //get parameters
         string fromEmail = Startup.externalConfiguration.GetSection("EmailStrings").GetValue<string>("SupportEmail");
         string fromPassword = Startup.externalConfiguration.GetSection("EmailStrings").GetValue<string>("SupportPassword");
         string toEmail = fromEmail;
 
-        //create message
         MailMessage message = new MailMessage(fromEmail, toEmail);
 
         //set values
@@ -2141,13 +2166,12 @@ public class UserModule
         SmtpClient client = new SmtpClient("smtp.gmail.com")
         {
             Port = 587,
-            Credentials = new NetworkCredential(fromEmail, fromPassword),
+            UseDefaultCredentials = false,
             EnableSsl = true,
+            DeliveryMethod = SmtpDeliveryMethod.Network,
+            Credentials = new NetworkCredential(fromEmail, fromPassword),
+            Timeout = 5000,
         };
-
-        //set cridentials
-        client.UseDefaultCredentials = true;
-        client.Timeout = 5000;
 
         try
         {
@@ -2157,7 +2181,6 @@ public class UserModule
         {
             return new Pair<bool, string>(false, "Could not send email");
         }
-
 
         return new Pair<bool, string>(true, "");
     }
@@ -2169,7 +2192,7 @@ public class UserModule
         JObject materContainer = new JObject();
 
         //get id
-        materContainer.Add(new JProperty("conversation_id", conversationBase));
+        materContainer.Add(new JProperty("conversation_id", conversationBase.id));
 
         //get name
         materContainer.Add(new JProperty("descriminator", conversationBase.descriminator));
@@ -2177,7 +2200,6 @@ public class UserModule
         //convert to string
         string body = materContainer.ToString();
 
-        //send email from no-reply
         //send email
         //get parameters
         string fromEmail = Startup.externalConfiguration.GetSection("EmailStrings").GetValue<string>("SupportEmail");
@@ -2195,13 +2217,12 @@ public class UserModule
         SmtpClient client = new SmtpClient("smtp.gmail.com")
         {
             Port = 587,
-            Credentials = new NetworkCredential(fromEmail, fromPassword),
+            UseDefaultCredentials = false,
             EnableSsl = true,
+            DeliveryMethod = SmtpDeliveryMethod.Network,
+            Credentials = new NetworkCredential(fromEmail, fromPassword),
+            Timeout = 5000,
         };
-
-        //set cridentials
-        client.UseDefaultCredentials = true;
-        client.Timeout = 5000;
 
         try
         {
@@ -2211,7 +2232,6 @@ public class UserModule
         {
             return new Pair<bool, string>(false, "Could not send email");
         }
-
 
         return new Pair<bool, string>(true, "");
     }
@@ -2223,7 +2243,7 @@ public class UserModule
         JObject materContainer = new JObject();
 
         //get id
-        materContainer.Add(new JProperty("user_id", otherFriendActivity.id));
+        materContainer.Add(new JProperty("activity_id", otherFriendActivity.id));
 
         //get name
         materContainer.Add(new JProperty("name", otherFriendActivity.name));
@@ -2231,17 +2251,14 @@ public class UserModule
         //convert to string
         string body = materContainer.ToString();
 
-        //send email from no-reply
         //send email
         //get parameters
         string fromEmail = Startup.externalConfiguration.GetSection("EmailStrings").GetValue<string>("SupportEmail");
         string fromPassword = Startup.externalConfiguration.GetSection("EmailStrings").GetValue<string>("SupportPassword");
         string toEmail = fromEmail;
 
-        //create message
         MailMessage message = new MailMessage(fromEmail, toEmail);
 
-        //set values
         message.Subject = "POP Activity Announcement has been reported";
         message.Body = body + "\n content: \n " + content;
 
@@ -2249,13 +2266,12 @@ public class UserModule
         SmtpClient client = new SmtpClient("smtp.gmail.com")
         {
             Port = 587,
-            Credentials = new NetworkCredential(fromEmail, fromPassword),
+            UseDefaultCredentials = false,
             EnableSsl = true,
+            DeliveryMethod = SmtpDeliveryMethod.Network,
+            Credentials = new NetworkCredential(fromEmail, fromPassword),
+            Timeout = 5000,
         };
-
-        //set cridentials
-        client.UseDefaultCredentials = true;
-        client.Timeout = 5000;
 
         try
         {
@@ -2265,7 +2281,6 @@ public class UserModule
         {
             return new Pair<bool, string>(false, "Could not send email");
         }
-
 
         return new Pair<bool, string>(true, "");
     }

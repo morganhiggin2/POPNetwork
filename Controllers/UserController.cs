@@ -3256,9 +3256,9 @@ public class UserController : ControllerBase
     /// </summary>
     /// <param name="user_id"></param>
     /// <returns></returns>
-    [HttpGet("Friends/Report/DirectMessage")]
+    [HttpPost("Friends/Report/DirectMessage")]
     [Authorize]
-    public async Task<IActionResult> FriendUserFriendDirectMessageReport(string user_id, string content)
+    public async Task<IActionResult> FriendUserFriendDirectMessageReport(FriendReportDirectMessageModel model)
     {
         ApplicationUser user = await _userManager.GetUserAsync(this.User);
 
@@ -3275,7 +3275,7 @@ public class UserController : ControllerBase
             return BadRequest("Current friend user is null");
         }
 
-        FriendUser otherFriendUser = _context.FriendUsers.Find(user_id);
+        FriendUser otherFriendUser = _context.FriendUsers.Find(model.user_id);
 
         if (otherFriendUser == null)
         {
@@ -3283,7 +3283,7 @@ public class UserController : ControllerBase
         }
 
         //report user and get result
-        Pair<bool, string> result = UserModule.FriendUserFriendDirectMessageReport(_context, currentFriendUser, otherFriendUser, content);
+        Pair<bool, string> result = UserModule.FriendUserFriendDirectMessageReport(_context, currentFriendUser, otherFriendUser, model.content);
 
         IdentityModule.SafelySaveChanges(_context);
 
@@ -3302,9 +3302,9 @@ public class UserController : ControllerBase
     /// </summary>
     /// <param name="user_id"></param>
     /// <returns></returns>
-    [HttpGet("Friends/Report/Conversation")]
+    [HttpPost("Friends/Report/Conversation")]
     [Authorize]
-    public async Task<IActionResult> FriendUserFriendConversationReport(string conversation_id, string content)
+    public async Task<IActionResult> FriendUserFriendConversationReport(FriendReportConversationModel model)
     {
         ApplicationUser user = await _userManager.GetUserAsync(this.User);
 
@@ -3321,7 +3321,7 @@ public class UserController : ControllerBase
             return BadRequest("Current friend user is null");
         }
 
-        ConversationBase conversationBase = _context.ConversationBases.Find(conversation_id);
+        ConversationBase conversationBase = _context.ConversationBases.Find(model.conversation_id);
 
         if (conversationBase == null)
         {
@@ -3342,7 +3342,7 @@ public class UserController : ControllerBase
             }
 
             //report activity and get result
-            result = UserModule.FriendUserFriendConversationReport(_context, currentFriendUser, conversationBase, content);
+            result = UserModule.FriendUserFriendConversationReport(_context, currentFriendUser, conversationBase, model.content);
         }
 
         IdentityModule.SafelySaveChanges(_context);
@@ -3363,9 +3363,9 @@ public class UserController : ControllerBase
     /// </summary>
     /// <param name="user_id"></param>
     /// <returns></returns>
-    [HttpGet("Friends/Report/Announcement")]
+    [HttpPost("Friends/Report/Announcement")]
     [Authorize]
-    public async Task<IActionResult> FriendUserFriendAnnouncementReport(string activity_id, string content)
+    public async Task<IActionResult> FriendUserFriendAnnouncementReport(FriendReportAnnouncementModel model)
     {
         ApplicationUser user = await _userManager.GetUserAsync(this.User);
 
@@ -3382,14 +3382,14 @@ public class UserController : ControllerBase
             return BadRequest("Current friend user is null");
         }
 
-        FriendActivity otherFriendActivity = _context.FriendActivities.Find(activity_id);
+        FriendActivity otherFriendActivity = _context.FriendActivities.Find(model.activity_id);
 
         if (otherFriendActivity == null)
         {
             return BadRequest("Friend activity to report was not found");
         }
 
-        Pair<bool, string> result = UserModule.FriendUserFriendActivityAnnouncementReport(_context, currentFriendUser, otherFriendActivity, content);
+        Pair<bool, string> result = UserModule.FriendUserFriendActivityAnnouncementReport(_context, currentFriendUser, otherFriendActivity, model.content);
 
         IdentityModule.SafelySaveChanges(_context);
 
