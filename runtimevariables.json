@@ -1,6 +1,6 @@
 {
 	"ConnectionStrings": {
-        "StorageAccount": "DefaultEndpointsProtocol=https;AccountName=popsocialstorage;AccountKey=2CoMZqc1PX4bwQAkZcAXFZZHhDsmTVM0t+FW/T7VNvyRXnKZbVAuyKQQtkk+jKBVIUl8icDRkfiB+AStF0teRQ==;EndpointSuffix=core.windows.net"
+        "StorageAccount": "DefaultEndpointsProtocol=https;AccountName=popsocialstorage;AccountKey=;EndpointSuffix=core.windows.net"
     },
 	"Urls": {
 		"AzureBlobBaseUrl": "photos.purpleorangepink.com",
@@ -8,9 +8,9 @@
 	},
 	"EmailStrings": {
 		"SupportEmail": "support@purpleorangepink.com",
-		"SupportPassword": "xfbzkwljauujunsr",
+		"SupportPassword": "",
 		"NoReplyEmail": "support@purpleorangepink.com",
-		"NoReplayPassword": "xfbzkwljauujunsr",
+		"NoReplayPassword": "",
 	},
 	"InternalParameters": {
 		"REPORT_LIMIT": 4,
@@ -24,6 +24,6 @@
 		"server": "tcp:popsocialserver.database.windows.net,1433",
 		"database": "popsocialdatabase",
 		"admin_login": "popdatabaseadmincontroller",
-		"admin_password": "t3e3nvuWjDss4Em",
+		"admin_password": ""
 	}
 }
